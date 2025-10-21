@@ -1,0 +1,28 @@
+{
+  "name": "web-features-plus-webview",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rolldown -c"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mdn/browser-compat-data": "^7.1.14",
+    "web-features": "^3.5.0"
+  },
+  "devDependencies": {
+    "export-to-csv": "^1.4.0",
+    "rolldown": "^1.0.0-beta.44"
+  }
+}
