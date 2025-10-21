@@ -13,8 +13,8 @@ const dataOut = Object.entries(features)
       webview_all: feature.webview_support.all,
       webview_android: feature.webview_support.android,
       webview_ios: feature.webview_support.ios,
-      webview_android_unsupported_compat_features: JSON.stringify(feature.webview_support.android_unsupported_compat_features),
-      webview_ios_unsupported_compat_features: JSON.stringify(feature.webview_support.ios_unsupported_compat_features)
+      webview_android_unsupported_compat_features: feature.webview_support.android_unsupported_compat_features ? feature.webview_support.android_unsupported_compat_features.join(", ") : "",
+      webview_ios_unsupported_compat_features: feature.webview_support.ios_unsupported_compat_features ? feature.webview_support.ios_unsupported_compat_features.join(", ") : ""
     }
   })
 
