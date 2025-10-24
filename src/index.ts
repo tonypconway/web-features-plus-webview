@@ -4,9 +4,9 @@ import { FeatureData, FeatureMovedData, FeatureSplitData } from 'web-features/ty
 
 type WebviewSupportData = {
   all: boolean;
-  android: boolean;
+  android: string;
   android_unsupported_compat_features?: string[];
-  ios: boolean;
+  ios: string;
   ios_unsupported_compat_features?: string[];
 }
 
@@ -27,8 +27,8 @@ const calculateWebviewSupport = (feature: FeatureData): WebviewSupportData => {
 
   let webview_support: WebviewSupportData = {
     all: true,
-    android: true,
-    ios: true,
+    android: "supported",
+    ios: "supported",
   }
 
   if (feature.compat_features) {
@@ -50,9 +50,9 @@ const calculateWebviewSupport = (feature: FeatureData): WebviewSupportData => {
       if (
         bcdFeatureSupport.webview_android.version_added === false
         ||
-        webview_support.android === false
+        webview_support.android === "unsupported"
       ) {
-        webview_support.android = false;
+        webview_support.android = "unsupported";
         if (!webview_support.android_unsupported_compat_features) {
           webview_support.android_unsupported_compat_features = []
         }
@@ -62,16 +62,28 @@ const calculateWebviewSupport = (feature: FeatureData): WebviewSupportData => {
       if (
         bcdFeatureSupport.webview_ios.version_added === false
         ||
-        webview_support.ios === false
+        webview_support.ios === "unsupported"
       ) {
-        webview_support.ios = false;
+        webview_support.ios = "unsupported";
         if (!webview_support.ios_unsupported_compat_features) {
           webview_support.ios_unsupported_compat_features = []
         }
         webview_support.ios_unsupported_compat_features.push(bcdKey);
       }
     });
+    if (webview_support.android_unsupported_compat_features) {
+      if (webview_support.android_unsupported_compat_features.length < feature.compat_features.length) {
+        webview_support.android = "partial";
+      }
+    }
+    if (webview_support.ios_unsupported_compat_features) {
+      if (webview_support.ios_unsupported_compat_features.length < feature.compat_features.length) {
+        webview_support.ios = "partial";
+      }
+    }
   }
+
+
 
   return webview_support
 }
