@@ -6,23 +6,35 @@ This module exports an augmented version of the `features` object exported from 
 import { features } from "web-features-plus-webview";
 ```
 
-The features object uses the same web feature IDs you can find in `web-features` or the [Web Status dashboard](https://webstatus.dev), but with an additional property added to all objects with `kind: "feature"`:
+The features object uses the same web feature IDs you can find in `web-features` or the [Web Status dashboard](https://webstatus.dev), but with an additional property added to all objects with `kind: "feature"` and which are Baseline Newly or Widely available (i.e. `status.baseline === 'low' || status.baseline === 'high'`):
 
 ```javascript
 webview_support: {
-    all: boolean, // whether the feature is supported in all webviews
-    android: boolean, // whether the feature is supported in android webviews
-    ios: boolean, // whether the feature is supported in iOS webviews
-    // Arrays of @mdn/browser-compat-data keys indicating which features are unsupported by the corresponding webview
+    all: boolean, // whether the feature has equivalent support in all webviews
+    android: boolean, // whether the feature has equivalent support in Android webview as Chrome for Android
+    ios: boolean, // whether the feature has equivalent support in iOS webviews as Safari for iOS
+    // Arrays of @mdn/browser-compat-data keys indicating which features are unsupported by the named webview that are supported in their corresponding browser
     android_unsupported_compat_features?: array,
     ios_unsupported_compat_features?: array,
   }
 ```
 
+In addition, in the `status.by_compat_key` object, each MDN key has a corresponding object indicating the webview support for that key:
+
+```javascript
+'mdn.bcd.key': {
+  ...,
+  webview_support: {
+    android: boolean;
+    ios: boolean;
+  }
+}
+```
+
 ## Installation
 
 ```bash
-npm install web-features-plus-webview
+npm install path/to/web-features-plus-webview
 ```
 
 ## Building from source

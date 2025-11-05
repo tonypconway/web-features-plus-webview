@@ -19,7 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@mdn/browser-compat-data": "^7.1.14",
-    "web-features": "^3.5.0"
+    "web-features": "^3.7.0"
   },
   "devDependencies": {
     "export-to-csv": "^1.4.0",
