@@ -25,8 +25,16 @@ In addition, in the `status.by_compat_key` object, each MDN key has a correspond
 'mdn.bcd.key': {
   ...,
   webview_support: {
-    android: boolean;
-    ios: boolean;
+    android: boolean | string, // false or the version added
+    ios: boolean | string, // false or the version added 
+    android_gap?: { // only included if there is a difference between Android Chrome and Webview Versions
+      versions: number, // the number of versions difference
+      time: number, // the number of days between the Chrome and Webview releases
+    },
+    ios_gap?: { // only included if there is a difference between iOS Safari and Webview Versions
+      versions: number, // the number of versions difference
+      time: number, // the number of days between the Safari and Webview releases
+    }
   }
 }
 ```

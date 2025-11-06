@@ -10,101 +10,158 @@ type WebviewSupportData = {
   ios_unsupported_compat_features?: string[];
 }
 
+type ReleaseGap = {
+  versions: number;
+  time: number;
+}
+
 interface FeatureDataPlusWebview extends FeatureData {
   webview_support: WebviewSupportData;
   status: FeatureData['status'] & {
     by_compat_key: {
       [compatKey: string]: NonNullable<FeatureData['status']['by_compat_key']>[string] & {
         webview_support?: {
-          android: boolean;
-          ios: boolean;
+          android: string | boolean;
+          ios: string | boolean;
+          android_gap?: ReleaseGap;
+          ios_gap?: ReleaseGap;
         }
       }
     }
   }
 }
 
-const resolveBcdKey = (keyString: string): any => {
-  let bcdEntry = bcd;
-  const splitKeys = keyString.split(".");
-  splitKeys.forEach(key => {
-    bcdEntry = (bcdEntry as any)[key]
-  });
-  return bcdEntry;
+const resolveBcdKey = (keyString: string): any =>
+  keyString.split(".").reduce((acc: any, key) => acc?.[key], bcd);
+
+const getWebViewSupportVersion = (supportData: any): string | false => {
+  return supportData?.partial_implementation === true ? false : supportData?.version_added;
 }
 
-const addWebviewSupport = (feature: FeatureData): FeatureDataPlusWebview => {
+const isFeatureSupported = (supportData: any): boolean => {
+  if (!supportData) return false;
+  const version = supportData.version_added;
+  return supportData.partial_implementation !== true && !!version && version !== 'preview';
+};
 
-  let webview_support: WebviewSupportData = {
+const calculateReleaseGap = (
+  mainBrowser: 'chrome_android' | 'safari_ios',
+  webviewBrowser: 'webview_android' | 'webview_ios',
+  mainVersion: string | boolean | null,
+  webviewVersion: string | boolean | null
+): ReleaseGap | undefined => {
+  if (typeof mainVersion !== 'string' || typeof webviewVersion !== 'string' || mainVersion === 'preview' || webviewVersion === 'preview') {
+    return undefined;
+  }
+
+  const browsers = bcd.browsers as any;
+  const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
+  const mainVersionSanitized = mainVersion.split('-')[0];
+  const webviewVersionSanitized = webviewVersion.split('-')[0];
+
+  const mainReleaseData = browsers[mainBrowser].releases;
+  const webviewReleaseData = browsers[webviewBrowser].releases;
+
+  const mainRelease = mainReleaseData[mainVersionSanitized];
+  const webviewRelease = webviewReleaseData[webviewVersionSanitized];
+
+  if (!mainRelease?.release_date || !webviewRelease?.release_date) {
+    return undefined;
+  }
+
+  const mainDate = new Date(mainRelease.release_date);
+  const webviewDate = new Date(webviewRelease.release_date);
+  const timeDiff = webviewDate.getTime() - mainDate.getTime();
+  const dayDiff = Math.round(timeDiff / (1000 * 60 * 60 * 24));
+
+  const allVersions = Object.keys(mainReleaseData).sort((a, b) => collator.compare(a, b));
+  const mainIndex = allVersions.indexOf(mainVersionSanitized);
+  const webviewIndex = allVersions.indexOf(webviewVersionSanitized);
+
+  if (mainIndex === -1 || webviewIndex === -1) {
+    return undefined;
+  }
+
+  const versionsDiff = Math.abs(webviewIndex - mainIndex);
+  if (versionsDiff > 0 || dayDiff !== 0) {
+    return {
+      versions: versionsDiff,
+      time: dayDiff
+    };
+  }
+
+  return undefined;
+};
+
+const addWebviewSupport = (feature: FeatureData): FeatureDataPlusWebview => {
+  const webview_support: WebviewSupportData = {
     all: "supported",
     android: "supported",
     ios: "supported",
+  };
+
+  const compatKeys = feature.status.by_compat_key ?? {};
+
+  const compatKeysBaseline = Object.entries(compatKeys)
+    .filter(([, bcdKeyData]) => bcdKeyData.baseline)
+    .map(([bcdKey]) => bcdKey);
+
+  for (const bcdKey in compatKeys) {
+    const bcdKeyFullData = resolveBcdKey(bcdKey);
+    if (!bcdKeyFullData?.__compat?.support) continue;
+
+    const support = bcdKeyFullData.__compat.support;
+
+    // Augment webview_support object
+    compatKeys[bcdKey].webview_support = {
+      android: getWebViewSupportVersion(support.webview_android),
+      ios: getWebViewSupportVersion(support.webview_ios),
+      android_gap: calculateReleaseGap(
+        'chrome_android',
+        'webview_android',
+        support.chrome_android?.version_added,
+        support.webview_android?.version_added
+      ),
+      ios_gap: calculateReleaseGap(
+        'safari_ios',
+        'webview_ios',
+        support.safari_ios?.version_added,
+        support.webview_ios?.version_added
+      ),
+    };
+
+    // Check for support discrepancies
+    if (isFeatureSupported(support.chrome_android) && !isFeatureSupported(support.webview_android)) {
+      webview_support.android = "partial";
+      (webview_support.android_unsupported_compat_features ??= []).push(bcdKey);
+    }
+    if (isFeatureSupported(support.safari_ios) && !isFeatureSupported(support.webview_ios)) {
+      webview_support.ios = "partial";
+      (webview_support.ios_unsupported_compat_features ??= []).push(bcdKey);
+    }
   }
 
-  let featureBaselineStatus = feature.status.baseline;
+  // Determine overall support status
+  if (webview_support.android === "partial" || webview_support.ios === "partial") {
+    webview_support.all = "partial";
+  }
 
-  let compatKeys = feature.status.by_compat_key ?? {};
-
-  let compatKeysBaseline = Object.entries(compatKeys).reduce((acc, [bcdKey, bcdKeyData]) => {
-    return bcdKeyData.baseline != false ? [...acc, bcdKey] : acc
-  }, [] as string[])
-
-  // Augment all the by_compat_keys with an object that shows 
-  Object.entries(compatKeys).forEach(([bcdKey,]) => {
-    let bcdKeyFullData = resolveBcdKey(bcdKey);
-    let androidWebviewSupport = bcdKeyFullData.__compat.support.webview_android.partial_implementation === true ? false : bcdKeyFullData.__compat.support.webview_android.version_added;
-    let iosWebviewSupport = bcdKeyFullData.__compat.support.webview_ios.partial_implementation === true ? false : bcdKeyFullData.__compat.support.webview_ios.version_added;
-    compatKeys[bcdKey].webview_support = {
-      android: androidWebviewSupport === false ? false : true,
-      ios: iosWebviewSupport === false ? false : true,
-    }
-  })
-
-  Object.entries(compatKeys).forEach(([bcdKey, bcdKeyData]) => {
-    // Skip BCD key features that are not part of Baseline
-    if (bcdKeyData.baseline != false) {
-      // Handle BCD keys that are Baseline but not supported in Android webview
-      if (bcdKeyData.webview_support.android === false) {
-        webview_support.all = "partial";
-        webview_support.android = "partial";
-        if (!webview_support.android_unsupported_compat_features) {
-          webview_support.android_unsupported_compat_features = [];
-        }
-        webview_support.android_unsupported_compat_features.push(bcdKey);
-      }
-      // Handle BCD keys that are Baseline but not supported in iOS webview
-      if (bcdKeyData.webview_support.ios === false) {
-        webview_support.all = "partial";
-        webview_support.ios = "partial";
-        if (!webview_support.ios_unsupported_compat_features) {
-          webview_support.ios_unsupported_compat_features = [];
-        }
-        webview_support.ios_unsupported_compat_features.push(bcdKey);
-      }
-    }
-  });
-
-  let androidUnsupportedCompatFeatureString: string = webview_support.android_unsupported_compat_features?.sort().join(",") ?? '';
-  let iosUnsupportedCompatFeatureString: string = webview_support.ios_unsupported_compat_features?.sort().join(",") ?? '';
-  let featureUnsupportedCompatFeatureString: string = compatKeysBaseline.sort().join(",") ?? '';
-
-  if ((androidUnsupportedCompatFeatureString === featureUnsupportedCompatFeatureString)
-    &&
-    webview_support.android != "supported") {
+  const androidUnsupportedBaseline = webview_support.android_unsupported_compat_features?.filter(key => compatKeysBaseline.includes(key)) ?? [];
+  if (compatKeysBaseline.length > 0 && androidUnsupportedBaseline.length === compatKeysBaseline.length) {
     webview_support.android = 'unsupported';
   }
-  if (iosUnsupportedCompatFeatureString === featureUnsupportedCompatFeatureString
-    &&
-    webview_support.ios != "supported"
-  ) {
+
+  const iosUnsupportedBaseline = webview_support.ios_unsupported_compat_features?.filter(key => compatKeysBaseline.includes(key)) ?? [];
+  if (compatKeysBaseline.length > 0 && iosUnsupportedBaseline.length === compatKeysBaseline.length) {
     webview_support.ios = 'unsupported';
   }
 
   if (webview_support.android === "unsupported" && webview_support.ios === "unsupported") {
-    webview_support.all = "unsupported"
+    webview_support.all = "unsupported";
   }
 
-  let featurePlusWebviewData: FeatureDataPlusWebview = {
+  return {
     ...feature,
     webview_support,
     status: {
@@ -112,9 +169,7 @@ const addWebviewSupport = (feature: FeatureData): FeatureDataPlusWebview => {
       by_compat_key: compatKeys,
     },
   };
-
-  return featurePlusWebviewData
-}
+};
 
 function getWebFeatureWithWebview(feature_id: string): FeatureDataPlusWebview {
   let feature = webFeatures[feature_id];
