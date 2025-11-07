@@ -6,9 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rolldown -c && tsc",
-    "prebuild": "npm run generate-data",
+    "prebuild": "prettier . --write; npm run generate-data",
     "postbuild": "cp src/data.json dist/",
-    "generate-data": "node scripts/generate_data.cjs"
+    "generate-csv": "node tools/generate_csv.js",
+    "generate-data": "node scripts/generate_data.js"
   },
   "exports": {
     ".": {

@@ -10,9 +10,9 @@ The features object uses the same web feature IDs you can find in `web-features`
 
 ```javascript
 webview_support: {
-    all: boolean, // whether the feature has equivalent support in all webviews
-    android: boolean, // whether the feature has equivalent support in Android webview as Chrome for Android
-    ios: boolean, // whether the feature has equivalent support in iOS webviews as Safari for iOS
+    all: "supported" | "partial" | "unsupported", // whether the feature is supported to the same level in all webviews as their corresponding browsers
+    android: "supported" | "partial" | "unsupported", // whether the feature has equivalent support in Android webview as Chrome for Android
+    ios: "supported" | "partial" | "unsupported", // whether the feature has equivalent support in iOS webviews as Safari for iOS
     // Arrays of @mdn/browser-compat-data keys indicating which features are unsupported by the named webview that are supported in their corresponding browser
     android_unsupported_compat_features?: array,
     ios_unsupported_compat_features?: array,
@@ -26,7 +26,7 @@ In addition, in the `status.by_compat_key` object, each MDN key has a correspond
   ...,
   webview_support: {
     android: boolean | string, // false or the version added
-    ios: boolean | string, // false or the version added 
+    ios: boolean | string, // false or the version added
     android_gap?: { // only included if there is a difference between Android Chrome and Webview Versions
       versions: number, // the number of versions difference
       time: number, // the number of days between the Chrome and Webview releases

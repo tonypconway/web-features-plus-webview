@@ -1,0 +1,22 @@
+{
+  "avif": {
+    "all": "equivalent",
+    "android": "equivalent",
+    "ios": "equivalent"
+  },
+  "http2": {
+    "all": "equivalent",
+    "android": "equivalent",
+    "ios": "equivalent"
+  },
+  "http3": {
+    "all": "equivalent",
+    "android": "equivalent",
+    "ios": "equivalent"
+  },
+  "webp": {
+    "all": "equivalent",
+    "android": "equivalent",
+    "ios": "equivalent"
+  }
+}
