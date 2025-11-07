@@ -22,8 +22,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mdn/browser-compat-data": "^7.1.14",
-    "web-features": "^3.7.0"
+    "@mdn/browser-compat-data": "^7.0.0",
+    "web-features": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
