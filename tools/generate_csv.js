@@ -24,7 +24,9 @@ for (const featureId in features) {
 
   const row = {
     "feature ID": featureId,
-    "baseline status": feature.discouraged ? "discouraged" : feature.status.baseline,
+    "baseline status": feature.discouraged
+      ? "discouraged"
+      : feature.status.baseline,
     "webview support": feature.webview_support.all,
     chrome_android: determineBrowserSupport(feature, "chrome_android"),
     webview_android: feature.webview_support.android,

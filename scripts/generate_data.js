@@ -14,9 +14,9 @@ const resolveBcdKey = (keyString) =>
 const getWebViewSupportVersion = (supportData) => {
   // TODO: Sometimes the support data for a given browser is an array, not a single object.
   // But web-features doesn't take this into account when building. To investigate.
-  // if (typeof supportData === Array) {
-  //   supportData = supportData[0]
-  // }
+  if (supportData instanceof Array) {
+    supportData = supportData[0];
+  }
   return supportData?.partial_implementation === true
     ? false
     : supportData?.version_added;
@@ -26,9 +26,9 @@ const isFeatureSupported = (supportData) => {
   if (!supportData) return false;
   // TODO: Sometimes the support data for a given browser is an array, not a single object.
   // But web-features doesn't take this into account when building. To investigate.
-  // if (typeof supportData === Array) {
-  //   supportData = supportData[0]
-  // }
+  if (supportData instanceof Array) {
+    supportData = supportData[0];
+  }
   const version = supportData.version_added;
   return (
     supportData.partial_implementation !== true &&
@@ -219,7 +219,13 @@ const addWebviewSupport = (feature_id, feature) => {
     (webview_support.android === "supported" &&
       webview_support.ios === "partial") ||
     (webview_support.android === "partial" &&
-      webview_support.ios === "supported")
+      webview_support.ios === "supported") ||
+    (webview_support.android === "partial" &&
+      webview_support.ios === "partial") ||
+    (webview_support.android === "partial" &&
+      webview_support.ios === "unsupported") ||
+    (webview_support.android === "usupported" &&
+      webview_support.ios === "partial")
   ) {
     webview_support.all = "partial";
   }
