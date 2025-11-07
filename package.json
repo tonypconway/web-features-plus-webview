@@ -5,7 +5,10 @@
   "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rolldown -c"
+    "build": "rolldown -c && tsc",
+    "prebuild": "npm run generate-data",
+    "postbuild": "cp src/data.json dist/",
+    "generate-data": "node scripts/generate_data.cjs"
   },
   "exports": {
     ".": {
@@ -22,7 +25,9 @@
     "web-features": "^3.7.0"
   },
   "devDependencies": {
+    "@types/node": "^20.12.12",
     "export-to-csv": "^1.4.0",
-    "rolldown": "^1.0.0-beta.44"
+    "rolldown": "^1.0.0-beta.44",
+    "typescript": "^5.4.5"
   }
 }

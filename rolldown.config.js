@@ -6,5 +6,5 @@ export default defineConfig({
     dir: './dist',
     format: 'es',
   },
-  external: ["web-features", "@mdn/browser-compat-data"]
+  external: ["web-features", "@mdn/browser-compat-data", "web-features/types", "fs", "path", "url"]
 });
