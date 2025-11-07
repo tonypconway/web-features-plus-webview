@@ -1,4 +1,5 @@
 import bcd from "@mdn/browser-compat-data" with { type: "json" };
+import overrides from "./overrides.json" with { type: "json" };
 import { features as webFeatures } from "web-features";
 import * as fs from "fs";
 import * as path from "path";
@@ -96,7 +97,13 @@ const calculateReleaseGap = (
   return undefined;
 };
 
-const addWebviewSupport = (feature) => {
+const addWebviewSupport = (feature_id, feature) => {
+  if (overrides[feature_id]) {
+    return {
+      ...feature,
+      webview_support: overrides[feature_id],
+    };
+  }
   const featureCopy = JSON.parse(JSON.stringify(feature));
   const webview_support = {
     all: "supported",
@@ -229,7 +236,7 @@ function getWebFeatureWithWebview(feature_id) {
     );
   }
 
-  return addWebviewSupport(feature);
+  return addWebviewSupport(feature_id, feature);
 }
 
 function getAllFeaturesWithWebview() {
