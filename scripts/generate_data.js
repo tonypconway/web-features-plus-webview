@@ -98,6 +98,16 @@ const calculateReleaseGap = (
 };
 
 const addWebviewSupport = (feature_id, feature) => {
+  if (feature.discouraged) {
+    return {
+      ...feature,
+      webview_support: {
+        all: "discouraged",
+        android: "discouraged",
+        ios: "discouraged",
+      },
+    };
+  }
   if (overrides[feature_id]) {
     return {
       ...feature,
@@ -205,8 +215,8 @@ const addWebviewSupport = (feature_id, feature) => {
     (webview_support.android === "supported" &&
       webview_support.ios === "unsupported") ||
     (webview_support.android === "unsupported" &&
-      webview_support.ios === "supported" &&
-      webview_support.android === "supported" &&
+      webview_support.ios === "supported") ||
+    (webview_support.android === "supported" &&
       webview_support.ios === "partial") ||
     (webview_support.android === "partial" &&
       webview_support.ios === "supported")

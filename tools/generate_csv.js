@@ -6,6 +6,9 @@ import * as fs from "fs";
 const data = [];
 
 const determineBrowserSupport = (feature, browser) => {
+  if (feature.discouraged) {
+    return "discouraged";
+  }
   if (feature.status.support[browser]) {
     return "supported";
   }
@@ -21,7 +24,7 @@ for (const featureId in features) {
 
   const row = {
     "feature ID": featureId,
-    "baseline status": feature.status.baseline,
+    "baseline status": feature.discouraged ? "discouraged" : feature.status.baseline,
     "webview support": feature.webview_support.all,
     chrome_android: determineBrowserSupport(feature, "chrome_android"),
     webview_android: feature.webview_support.android,
