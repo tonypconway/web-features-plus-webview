@@ -1,10 +1,17 @@
-import { defineConfig } from 'rolldown';
+import { defineConfig } from "rolldown";
 
 export default defineConfig({
-  input: './src/index.ts',
+  input: "./src/index.ts",
   output: {
-    dir: './dist',
-    format: 'es',
+    dir: "./dist",
+    format: "es",
   },
-  external: ["web-features", "@mdn/browser-compat-data"]
+  external: [
+    "web-features",
+    "@mdn/browser-compat-data",
+    "web-features/types",
+    "fs",
+    "path",
+    "url",
+  ],
 });

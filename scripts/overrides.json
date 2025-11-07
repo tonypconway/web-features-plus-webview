@@ -1,0 +1,22 @@
+{
+  "avif": {
+    "all": "supported",
+    "android": "supported",
+    "ios": "supported"
+  },
+  "http2": {
+    "all": "supported",
+    "android": "supported",
+    "ios": "supported"
+  },
+  "http3": {
+    "all": "supported",
+    "android": "supported",
+    "ios": "supported"
+  },
+  "webp": {
+    "all": "supported",
+    "android": "supported",
+    "ios": "supported"
+  }
+}
