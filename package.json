@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "npm run build",
     "postinstall": "npm run build",
-    "build": "rolldown -c && tsc",
-    "prebuild": "prettier . --write; npm run generate-data",
+    "build": "npx rolldown -c && tsc",
+    "prebuild": "npx prettier . --write; npm run generate-data",
     "postbuild": "cp src/data.json dist/",
     "generate-csv": "node tools/generate_csv.js",
     "generate-data": "node scripts/generate_data.js"
