@@ -5,9 +5,10 @@
   "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "npm i && npm run build",
-    "build": "rolldown -c && tsc",
-    "prebuild": "prettier . --write; npm run generate-data",
+    "prepare": "npm run build",
+    "postinstall": "npm run build",
+    "build": "npx rolldown -c && tsc",
+    "prebuild": "npx prettier . --write; npm run generate-data",
     "postbuild": "cp src/data.json dist/",
     "generate-csv": "node tools/generate_csv.js",
     "generate-data": "node scripts/generate_data.js"
@@ -24,12 +25,13 @@
   "license": "ISC",
   "dependencies": {
     "@mdn/browser-compat-data": "^7.0.0",
+    "prettier": "^3.3.3",
+    "rolldown": "^1.0.0-beta.44",
     "web-features": "^3.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
     "export-to-csv": "^1.4.0",
-    "rolldown": "^1.0.0-beta.44",
     "typescript": "^5.4.5"
   }
 }
