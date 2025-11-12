@@ -1,22 +1,22 @@
 {
   "avif": {
-    "all": "supported",
-    "android": "supported",
-    "ios": "supported"
+    "all": "equivalent",
+    "android": "equivalent",
+    "ios": "equivalent"
   },
   "http2": {
-    "all": "supported",
-    "android": "supported",
-    "ios": "supported"
+    "all": "equivalent",
+    "android": "equivalent",
+    "ios": "equivalent"
   },
   "http3": {
-    "all": "supported",
-    "android": "supported",
-    "ios": "supported"
+    "all": "equivalent",
+    "android": "equivalent",
+    "ios": "equivalent"
   },
   "webp": {
-    "all": "supported",
-    "android": "supported",
-    "ios": "supported"
+    "all": "equivalent",
+    "android": "equivalent",
+    "ios": "equivalent"
   }
 }

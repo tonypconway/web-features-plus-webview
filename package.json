@@ -1,6 +1,6 @@
 {
   "name": "web-features-plus-webview",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
@@ -11,6 +11,7 @@
     "prebuild": "npx prettier . --write; npm run generate-data",
     "postbuild": "cp src/data.json dist/",
     "generate-csv": "node tools/generate_csv.js",
+    "generate-by-bcd-key-csv": "node tools/generate_by_bcd_key_csv.js",
     "generate-data": "node scripts/generate_data.js"
   },
   "exports": {
